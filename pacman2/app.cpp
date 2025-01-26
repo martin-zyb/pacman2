@@ -1,5 +1,4 @@
-﻿//zh_CN.GBK
-#include "game.h"
+﻿#include "game.h"
 
 int main()
 {
@@ -8,7 +7,7 @@ int main()
 
 	BeginBatchDraw();
 
-	set_game_mode(MENU);
+	set_game_mode(Status::MENU);
 
 	// 主循环xu
 	while (!game_close)
@@ -17,9 +16,9 @@ int main()
 		{
 			switch (game_mode)
 			{
-			case GAMING:	gaming_deal();		break;
-			case END:		end_deal();			break;
-			case MENU:		menu_deal();		break;
+			case Status::GAMING:	gaming_deal();		break;
+			case Status::END:		end_deal();			break;
+			case Status::MENU:		menu_deal();		break;
 			}
 			
 
@@ -38,9 +37,9 @@ int main()
 
 			switch (game_mode)
 			{
-			case GAMING:	gaming_page();		break;
-			case END:		end_page();			break;
-			case MENU:		menu_page();		break;
+			case Status::GAMING:	gaming_page();		break;
+			case Status::END:		end_page();			break;
+			case Status::MENU:		menu_page();		break;
 			}
 
 		}

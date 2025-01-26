@@ -1,10 +1,9 @@
-//zh_CN.GBK
 #include "game.h"
 
 int cnt1 = 1;
 int cnt2 = 1;
 
-int game_mode;
+Status game_mode;
 
 bool game_close;				// 指导多线程关闭的全局变量
 bool update_event;				// 指导绘图更新的全局变量，控制帧率
@@ -17,7 +16,7 @@ CMonster orange;
 CMonster blue;
 CMonster* mons_list[4] = {&red, &pink, &orange, &blue};
 
-int map[MAP_CNT];		// 地图 31 x 28 行列式存储（但是需要注意 easyx 是 列行式绘图）
+int map[static_cast<int>(Map::CNT)];		// 地图 31 x 28 行列式存储（但是需要注意 easyx 是 列行式绘图）
 
 IMAGE background;		// 背景图片
 
@@ -84,7 +83,7 @@ DWORD WINAPI keyboard_thread(PVOID)
 
 #define LOAD_PNG_FROM_RC(PIMAGE,PNG_ID,ROW,COLUMN);					\
 	loadimage(PIMAGE, _T("PNG"), MAKEINTRESOURCE(PNG_ID),			\
-			PERSON_SIZE * COLUMN, PERSON_SIZE * ROW, 1);
+			static_cast<int>(Size::PERSON) * COLUMN, static_cast<int>(Size::PERSON) * ROW, 1);
 
 #define LOAD_MONSTER_FACE(PIMAGE, PNG_ID);							\
 	LOAD_PNG_FROM_RC(PIMAGE, PNG_ID, 4, 2);
@@ -92,8 +91,8 @@ DWORD WINAPI keyboard_thread(PVOID)
 #define INIT_MONSTER(CMONSTER, PFACE, PDEAD, SPEED, BURN_R, BURN_C, INSTANCE, PATH, COLOR);		\
 	CMONSTER.init_speed(SPEED);																	\
 	CMONSTER.init_map(map);																		\
-	CMONSTER.init_rect(CRect(BURN_R * BLOCK_SIZE - PERSON_SIZE / 2,								\
-			BURN_C * BLOCK_SIZE - PERSON_SIZE / 2, PERSON_SIZE, PERSON_SIZE));					\
+	CMONSTER.init_rect(CRect(BURN_R * static_cast<int>(Size::BLOCK) - static_cast<int>(Size::PERSON) / 2,								\
+			BURN_C * static_cast<int>(Size::BLOCK) - static_cast<int>(Size::PERSON) / 2, static_cast<int>(Size::PERSON), static_cast<int>(Size::PERSON)));					\
 	CMONSTER.init_img(&background, PFACE, PDEAD);												\
 /**CMONSTER.SwitchPathShow(COLOR);	/**/														\
 	CMONSTER.SetBrainStyle(INSTANCE, PATH);
@@ -114,9 +113,9 @@ void init()
 	IMAGE img_pacman;
 	LOAD_PNG_FROM_RC(&img_pacman, IDB_PNG1, 4, 3);
 
-	pacman.init_speed(PACMAN_SPEED);
+	pacman.init_speed(static_cast<double>(Speed::PACMAN) / 10);
 	pacman.init_map(map);
-	pacman.init_rect(CRect(20 * BLOCK_SIZE - PERSON_SIZE / 2, 10 * BLOCK_SIZE - PERSON_SIZE / 2, PERSON_SIZE, PERSON_SIZE));
+	pacman.init_rect(CRect(20 * static_cast<int>(Size::BLOCK) - static_cast<int>(Size::PERSON) / 2, 10 * static_cast<int>(Size::BLOCK) - static_cast<int>(Size::PERSON) / 2, static_cast<int>(Size::PERSON), static_cast<int>(Size::PERSON)));
 	pacman.init_img(&background, &img_pacman, 4, 3);
 
 	// init monsters
@@ -129,10 +128,10 @@ void init()
 
 	LOAD_PNG_FROM_RC(&img_dead, IDB_PNG6, 4, 2);
 
-	INIT_MONSTER(blue, &img_blue, &img_dead, MONSTER_SPEED_1, 12, 10, 10, 1, BLUE);
-	INIT_MONSTER(orange, &img_orange, &img_dead, MONSTER_SPEED_0, 13, 10, 3, 1, YELLOW);
-	INIT_MONSTER(pink, &img_pink, &img_dead, MONSTER_SPEED_0, 12, 10, 1, 3, BROWN);
-	INIT_MONSTER(red, &img_red, &img_dead, MONSTER_SPEED_1, 13, 10, 1, 10, RED);
+	INIT_MONSTER(blue, &img_blue, &img_dead, static_cast<double>(Speed::MONSTER_FAST) / 10, 12, 10, 10, 1, BLUE);
+	INIT_MONSTER(orange, &img_orange, &img_dead, static_cast<double>(Speed::MONSTER_SLOW) / 10, 13, 10, 3, 1, YELLOW);
+	INIT_MONSTER(pink, &img_pink, &img_dead, static_cast<double>(Speed::MONSTER_SLOW) / 10, 12, 10, 1, 3, BROWN);
+	INIT_MONSTER(red, &img_red, &img_dead, static_cast<double>(Speed::MONSTER_FAST) / 10, 13, 10, 1, 10, RED);
 
 	// 设置多线程
 	CreateThread(NULL, 0, keyboard_thread, NULL, 0, NULL);
@@ -141,7 +140,7 @@ void init()
 
 void init_map()
 {
-	const static int a[MAP_CNT] =
+	const static int a[static_cast<int>(Map::CNT)] =
 	{
 		3,3,3,3,3, 3,3,3,3,3, 3, 3,3,3,3,3, 3,3,3,3,3, 
 		3,1,1,1,1, 1,1,1,1,1, 3, 1,1,1,1,1, 1,1,1,1,3,
@@ -177,7 +176,7 @@ void init_map()
 		3,3,3,3,3, 3,3,3,3,3, 3, 3,3,3,3,3, 3,3,3,3,3,
 	};
 
-	for (int i = 0; i < MAP_CNT; i++)
+	for (int i = 0; i < static_cast<int>(Map::CNT); i++)
 		map[i] = a[i];
 }
 
@@ -192,23 +191,23 @@ void init_background()
 
 	putimage(6, 3, &bb);
 
-	int bias = BLOCK_SIZE / 2;
-	int s = BLOCK_SIZE;
+	int bias = static_cast<int>(Size::BLOCK) / 2;
+	int s = static_cast<int>(Size::BLOCK);
 
 	setlinecolor(BLUE);
-	for (int i = 0; i < MAP_ROW; i++)
+	for (int i = 0; i < static_cast<int>(Map::ROW); i++)
 	{
-		for (int j = 0; j < MAP_COLUMN; j++)
+		for (int j = 0; j < static_cast<int>(Map::COLUMN); j++)
 		{
-			if (map[i * MAP_COLUMN + j] == 1)
+			if (map[i * static_cast<int>(Map::COLUMN) + j] == 1)
 			{
 				setfillcolor(WHITE);
-				solidcircle(j * s + bias, i * s + bias, POINT_SIZE);
+				solidcircle(j * s + bias, i * s + bias, static_cast<int>(Size::POINT));
 			}
-			else if (map[i * MAP_COLUMN + j] == 2)
+			else if (map[i * static_cast<int>(Map::COLUMN) + j] == 2)
 			{
 				setfillcolor(YELLOW);
-				solidcircle(j * s + bias, i * s + bias, POINT_BIG_SIZE);
+				solidcircle(j * s + bias, i * s + bias, static_cast<int>(Size::BIG_POINT));
 			}
 		}
 	}
@@ -216,14 +215,14 @@ void init_background()
 	SetWorkingImage(NULL);
 }
 
-void set_game_mode(int mode)
+void set_game_mode(Status mode)
 {
 	game_mode = mode;
 	switch (mode)
 	{
-	case GAMING: gaming_page_init();	break;
-	case END:	 end_page_init();		break;
-	case MENU:	 menu_page_init();		break;
+	case Status::GAMING: gaming_page_init();	break;
+	case Status::END:	 end_page_init();		break;
+	case Status::MENU:	 menu_page_init();		break;
 	}
 }
  
@@ -233,8 +232,8 @@ void menu_page_init()
 {
 	choose = 0;
 
-	static const int w_base = BLOCK_SIZE * 5;
-	static const int h_base = BLOCK_SIZE * 6;
+	static const int w_base = static_cast<int>(Size::BLOCK) * 5;
+	static const int h_base = static_cast<int>(Size::BLOCK) * 6;
 
 	fillrectangle(w_base, h_base, w_base + 200, h_base + 200);
 
@@ -259,8 +258,8 @@ void end_page_init()
 {
 	choose = 0;
 
-	static const int w_base = BLOCK_SIZE * 5;
-	static const int h_base = BLOCK_SIZE * 6;
+	static const int w_base = static_cast<int>(Size::BLOCK) * 5;
+	static const int h_base = static_cast<int>(Size::BLOCK) * 6;
 	fillrectangle(w_base, h_base, w_base + 200, h_base + 200);
 
 	settextcolor(BLACK);
@@ -301,7 +300,7 @@ void gaming_page_init()
 
 	// UI print
 	putimage(0, 0, &background);
-	outtextxy(1 * BLOCK_SIZE + BLOCK_SIZE / 2, 10 * BLOCK_SIZE , _T("score:"));
+	outtextxy(1 * static_cast<int>(Size::BLOCK) + static_cast<int>(Size::BLOCK) / 2, 10 * static_cast<int>(Size::BLOCK), _T("score:"));
 
 	pacman.Draw();
 	for (int i = 0; i < 4; i++)
@@ -314,8 +313,8 @@ void gaming_page_init()
 
 void menu_page()
 {
-	static const int w_base = BLOCK_SIZE * 5;
-	static const int h_base = BLOCK_SIZE * 6;
+	static const int w_base = static_cast<int>(Size::BLOCK) * 5;
+	static const int h_base = static_cast<int>(Size::BLOCK) * 6;
 
 	
 	settextcolor(WHITE);
@@ -349,7 +348,7 @@ void gaming_page()
 
 	for (int i = 0; i < 4; i++)
 	{
-		if(mons_list[i]->GetDir() == 0)	// Detect if any monsters are stuck due to dir=0
+		if(mons_list[i]->GetDir() == Dir::NOME)	// Detect if any monsters are stuck due to dir=0
 		{
 			mons_list[i]->BugReset();		// Correct incorrect dir values
 		}
@@ -376,7 +375,7 @@ void gaming_page()
 		if (bean_type == 2)
 		{
 			for (int i = 0; i < 4; i++)
-				mons_list[i]->Fear(MONSTER_FEAR_TIME);
+				mons_list[i]->Fear(static_cast<int>(Time::MONSTER_FEAR));
 		}
 	}
 
@@ -401,14 +400,14 @@ void gaming_page()
 		int scr = pacman.GetScore();
 		if (scr > highest_score)
 			highest_score = scr;
-		set_game_mode(END);
+		set_game_mode(Status::END);
 	}
 }
 
 void end_page()
 {
-	static const int w_base = BLOCK_SIZE * 5;
-	static const int h_base = BLOCK_SIZE * 6;
+	static const int w_base = static_cast<int>(Size::BLOCK) * 5;
+	static const int h_base = static_cast<int>(Size::BLOCK) * 6;
 
 	settextcolor(WHITE);
 	if (choose == 0)
@@ -437,14 +436,14 @@ void gaming_deal()
 {
 	// 设置参数
 	if (key == 27)
-		set_game_mode(END);
+		set_game_mode(Status::END);
 
 	switch (key)
 	{
-	case 'w': pacman.SetNewDir(DIR_UP); break;
-	case 's': pacman.SetNewDir(DIR_DOWN); break;
-	case 'a': pacman.SetNewDir(DIR_LEFT); break;
-	case 'd': pacman.SetNewDir(DIR_RIGHT); break;
+	case 'w': pacman.SetNewDir(Dir::UP);	break;
+	case 's': pacman.SetNewDir(Dir::DOWN);	break;
+	case 'a': pacman.SetNewDir(Dir::LEFT);	break;
+	case 'd': pacman.SetNewDir(Dir::RIGHT);	break;
 	}
 }
 
@@ -453,7 +452,7 @@ void menu_deal()
 	if (key == ' ' || key == 'z')
 	{
 		if (choose == 0)
-			set_game_mode(GAMING);
+			set_game_mode(Status::GAMING);
 		else
 			game_close = 1;
 	}
@@ -476,7 +475,7 @@ void end_deal()
 	if (key == ' ' || key == 'z')
 	{
 		if (choose == 0)
-			set_game_mode(MENU);
+			set_game_mode(Status::MENU);
 		else
 			game_close = 1;
 	}

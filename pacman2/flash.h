@@ -1,6 +1,5 @@
-//zh_CN.GBK
 #pragma once
-// ´ËÎÄµµÖ÷Òª¶¨ÒåÁË¶¯»­ĞòÁĞ flashÀà£¬ÒÔ¼°¶à¸ö¶¯»­ĞòÁĞµÄ¹ÜÀíÀà flash_groupÀà
+// æ­¤æ–‡æ¡£ä¸»è¦å®šä¹‰äº†åŠ¨ç”»åºåˆ— flashç±»ï¼Œä»¥åŠå¤šä¸ªåŠ¨ç”»åºåˆ—çš„ç®¡ç†ç±» flash_groupç±»
 
 #include "define.h"
 
@@ -8,7 +7,7 @@ class CFlash
 {
 private:
 	vector<IMAGE*> m_list;
-	size_t idx_now;				// µ±Ç°ÏÔÊ¾Ë÷Òı
+	size_t idx_now;				// å½“å‰æ˜¾ç¤ºç´¢å¼•
 
 public:
 	CFlash() :idx_now(0) {}
@@ -24,7 +23,7 @@ public:
 		return *(m_list[idx_now]);
 	}
 
-	// Í¨¹ıupdateº¯ÊıµÄ²»¶Ï¸üĞÂ£¬ÇĞ»»¶¯»­ĞòÁĞÖĞÕ¹Ê¾µÄÍ¼Æ¬£¬ÊµÏÖ¶¯×÷µÄ±ä»¯
+	// é€šè¿‡updateå‡½æ•°çš„ä¸æ–­æ›´æ–°ï¼Œåˆ‡æ¢åŠ¨ç”»åºåˆ—ä¸­å±•ç¤ºçš„å›¾ç‰‡ï¼Œå®ç°åŠ¨ä½œçš„å˜åŒ–
 	void Update()
 	{
 		idx_now++;
@@ -37,8 +36,8 @@ class CFlashGroup
 {
 private:
 	vector<CFlash> m_list;
-	int idx_now;	// ÇĞ»»²»Í¬µÄ¶¯»­ĞòÁĞ£¬ÊµÏÖ²»Í¬µÄ¶¯×÷Ğ§¹û
-	int cnt;		// ¼ÆÊ±Æ÷£¬¿ØÖÆ¶¯»­ĞòÁĞËÙ¶È
+	int idx_now;	// åˆ‡æ¢ä¸åŒçš„åŠ¨ç”»åºåˆ—ï¼Œå®ç°ä¸åŒçš„åŠ¨ä½œæ•ˆæœ
+	int cnt;		// è®¡æ—¶å™¨ï¼Œæ§åˆ¶åŠ¨ç”»åºåˆ—é€Ÿåº¦
 	int top;
 
 public:
@@ -50,7 +49,7 @@ public:
 		m_list.push_back(flash);
 	}
 
-	// ÉèÖÃµ±Ç°Õ¹Ê¾µÄ¶¯»­ĞòÁĞ
+	// è®¾ç½®å½“å‰å±•ç¤ºçš„åŠ¨ç”»åºåˆ—
 	void SetIdx(int idx)
 	{
 		idx_now = idx;
@@ -61,7 +60,7 @@ public:
 		return m_list[idx_now].GetImage();
 	}
 
-	// update flash¶ÔÏó
+	// update flashå¯¹è±¡
 	void Update()
 	{
 		cnt++;
@@ -70,7 +69,7 @@ public:
 			cnt = 0;
 			m_list[idx_now].Update();
 
-			// È«²¿¸üĞÂ¡ı »òÕß ¡ü½ö¸üĞÂµ±Ç°ÏÔÊ¾µÄ¶¯»­ĞòÁĞ
+			// å…¨éƒ¨æ›´æ–°â†“ æˆ–è€… â†‘ä»…æ›´æ–°å½“å‰æ˜¾ç¤ºçš„åŠ¨ç”»åºåˆ—
 
 			//for (vector<CFlash>::iterator iter = m_list.begin(); iter != m_list.end(); iter++)
 			//	(*iter).Update();

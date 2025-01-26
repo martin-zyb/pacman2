@@ -1,4 +1,3 @@
-//zh_CN.GBK
 #pragma once
 // 此文档主要定义了 mover类，以及其派生的 monster类
 
@@ -25,14 +24,14 @@ protected:
 	double speed;
 	double speed_d;
 
-	int new_dir;				// 新的运动方向，加入此属性是为了改善游戏手感
-	int dir;					// 运动方向
+	Dir new_dir;				// 新的运动方向，加入此属性是为了改善游戏手感
+	Dir dir;					// 运动方向
 
 
 public:
-	CMover() :p_background(NULL), map(NULL), speed(0), speed_d(0), new_dir(DIR_NONE), dir(DIR_NONE) 
+	CMover() :p_background(NULL), map(NULL), speed(0), speed_d(0), new_dir(Dir::NOME), dir(Dir::NOME) 
 	{
-		faces = CFlashGroup(EAT_FLASH_TIME);
+		faces = CFlashGroup(static_cast<int>(Time::EAT_FLASH));
 	}
 
 	// 将初始化分解为一系列函数,请按照顺序执行
@@ -86,13 +85,13 @@ public:
 	void Reset()
 	{
 		rect.site = burn;
-		dir = DIR_NONE;
-		new_dir = DIR_NONE;
+		dir = Dir::NOME;
+		new_dir = Dir::NOME;
 	}
 
 	void BugReset()		// Set the dir of monsters that are stuck due to dir=0 to 1 to prevent them from getting stuck.
 	{
-		dir = 1;
+		dir = Dir::DOWN;
 	}
 
 	// 设置/读取 当前位置的左上角坐标
@@ -107,14 +106,14 @@ public:
 		return center;
 	};
 
-	void SetFlash(int d)
+	void SetFlash(Dir d)
 	{
 		switch (d)
 		{
-		case DIR_DOWN:  faces.SetIdx(3);  break;
-		case DIR_UP:	faces.SetIdx(2);  break;
-		case DIR_RIGHT: faces.SetIdx(0);  break;
-		case DIR_LEFT:	faces.SetIdx(1);  break;
+		case Dir::DOWN:		faces.SetIdx(3);  break;
+		case Dir::UP:		faces.SetIdx(2);  break;
+		case Dir::RIGHT:	faces.SetIdx(0);  break;
+		case Dir::LEFT:		faces.SetIdx(1);  break;
 		}
 	}
 
@@ -130,14 +129,14 @@ public:
 
 		switch (dir)
 		{
-		case DIR_DOWN:  rect.site.x += s; break;	// 下
-		case DIR_RIGHT: rect.site.y += s; break;	// 右
-		case DIR_UP:	rect.site.x -= s; break;	// 上
-		case DIR_LEFT:	rect.site.y -= s; break;	// 左
+		case Dir::DOWN	:	rect.site.x += s; break;	// 下
+		case Dir::RIGHT	:	rect.site.y += s; break;	// 右
+		case Dir::UP	:	rect.site.x -= s; break;	// 上
+		case Dir::LEFT	:	rect.site.y -= s; break;	// 左
 		}
 	}
 
-	void SetNewDir(int d)
+	void SetNewDir(Dir d)
 	{
 		new_dir = d;
 	}
@@ -147,14 +146,14 @@ public:
 		CPoint c = GetCenter();
 
 		// 距离最靠近的格点的距离
-		dx = (c.x + BLOCK_SIZE / 2) % BLOCK_SIZE - BLOCK_SIZE / 2;
-		dy = (c.y + BLOCK_SIZE / 2) % BLOCK_SIZE - BLOCK_SIZE / 2;
+		dx = (c.x + static_cast<int>(Size::BLOCK) / 2) % static_cast<int>(Size::BLOCK) - static_cast<int>(Size::BLOCK) / 2;
+		dy = (c.y + static_cast<int>(Size::BLOCK) / 2) % static_cast<int>(Size::BLOCK) - static_cast<int>(Size::BLOCK) / 2;
 
 		int x = c.x - dx;
 		int y = c.y - dy;
 
-		i = x / BLOCK_SIZE;
-		j = y / BLOCK_SIZE;
+		i = x / static_cast<int>(Size::BLOCK);
+		j = y / static_cast<int>(Size::BLOCK);
 	}
 
 	bool Turn()
@@ -172,22 +171,22 @@ public:
 			// 不在转弯容县内，不许转弯，按旧方向前进
 		// 没有转向，按旧方向前进
 
-		if (new_dir == DIR_NONE)
+		if (new_dir == Dir::NOME)
 		{
-			dir = DIR_NONE;
+			dir = Dir::NOME;
 			return 1;
 		}
-		else if (abs(new_dir) != abs(dir) )	// 是否有转向
+		else if (abs(static_cast<int>(new_dir)) != abs(static_cast<int>(dir)) )	// 是否有转向
 		{
 			// 转弯限制
-			const int t = MOVE_TOLERENCE;	// 宽容门限
+			const int t = static_cast<int>(Tolerence::MOVE);	// 宽容门限
 
 			int dx, dy, i, j;
 			GetNearCross(dx, dy, i, j);
 
 			bool turn_flag = 0;
 
-			if ((abs(new_dir) == 2 && abs(dx) < t) || (abs(new_dir) == 1 && abs(dy) < t))
+			if ((abs(static_cast<int>(new_dir)) == 2 && abs(dx) < t) || (abs(static_cast<int>(new_dir)) == 1 && abs(dy) < t))
 				turn_flag = 1;
 
 			if (turn_flag)		// 是否在转弯容限内
@@ -195,21 +194,21 @@ public:
 				// 下一个格点
 				switch (new_dir)
 				{
-				case DIR_DOWN:  i++;  break;
-				case DIR_UP:	i--;  break;
-				case DIR_RIGHT: j++;  break;
-				case DIR_LEFT:	j--;  break;
+				case Dir::DOWN	:	i++;  break;
+				case Dir::UP	:	i--;  break;
+				case Dir::RIGHT	:	j++;  break;
+				case Dir::LEFT	:	j--;  break;
 				}
 
 				bool edge_flag = 0;
-				if (j < 0 || j >= MAP_COLUMN)
+				if (j < 0 || j >= static_cast<int>(Map::COLUMN))
 					edge_flag = 1;
 
 				if (!edge_flag)	// 是否在边界
 				{
 					bool wall_flag = 0;
 
-					if (map[i * MAP_COLUMN + j] == 3)
+					if (map[i * static_cast<int>(Map::COLUMN) + j] == 3)
 						wall_flag = 1;
 
 					if (!wall_flag)	// 转弯后是否撞墙
@@ -242,7 +241,7 @@ public:
 			}
 
 		}
-		else	// 可能是掉头或者从DIR_NONE起步
+		else	// 可能是掉头或者从DIR::NOME起步
 		{
 			dir = new_dir;
 			return 1;
@@ -264,14 +263,14 @@ public:
 
 		switch (dir)
 		{
-		case DIR_DOWN:  if (dx >= 0) i++; break;	// 下
-		case DIR_RIGHT: if (dy >= 0) j++; break;	// 右
-		case DIR_UP:	if (dx <= 0) i--; break;	// 上
-		case DIR_LEFT:	if (dy <= 0) j--; break;	// 左
+		case Dir::DOWN:		if (dx >= 0) i++; break;	// 下
+		case Dir::RIGHT:	if (dy >= 0) j++; break;	// 右
+		case Dir::UP:		if (dx <= 0) i--; break;	// 上
+		case Dir::LEFT:		if (dy <= 0) j--; break;	// 左
 		}
 
 		// 如果超过边界，就不进行撞墙检查
-		if (j < 0 || j >= MAP_COLUMN)
+		if (j < 0 || j >= static_cast<int>(Map::COLUMN))
 		{
 			// 移动
 			Move(speed);
@@ -287,19 +286,19 @@ public:
 
 		int s = (int)speed;	// 移动距离
 
-		if (map[i * MAP_COLUMN + j] == 3)	// 墙
+		if (map[i * static_cast<int>(Map::COLUMN) + j] == 3)	// 墙
 		{
-			const int t = BLOCK_SIZE - PERSON_SIZE / 2;	// 墙壁的厚度
+			const int t = static_cast<int>(Size::BLOCK) - static_cast<int>(Size::PERSON) / 2;	// 墙壁的厚度
 
 			// 计算与墙的距离
 			int instance = (int)speed;
 
 			switch (dir)
 			{
-			case DIR_DOWN:  instance = (i * BLOCK_SIZE - t) - (rect.site.x + rect.shape.x);	break;
-			case DIR_RIGHT: instance = (j * BLOCK_SIZE - t) - (rect.site.y + rect.shape.y); break;
-			case DIR_UP:	instance = (rect.site.x) - (i * BLOCK_SIZE + t);				break;
-			case DIR_LEFT:	instance = (rect.site.y) - (j * BLOCK_SIZE + t);				break;
+			case Dir::DOWN:		instance = (i * static_cast<int>(Size::BLOCK) - t) - (rect.site.x + rect.shape.x);	break;
+			case Dir::RIGHT:	instance = (j * static_cast<int>(Size::BLOCK) - t) - (rect.site.y + rect.shape.y);	break;
+			case Dir::UP:		instance = (rect.site.x) - (i * static_cast<int>(Size::BLOCK) + t);				break;
+			case Dir::LEFT:		instance = (rect.site.y) - (j * static_cast<int>(Size::BLOCK) + t);				break;
 			}
 
 			
@@ -351,24 +350,24 @@ public:
 	void Draw()
 	{
 		// 为了美观，
-		// 绘图坐标draw 和 实际坐标site 之间存在固定偏差 bias = BLOCK_SIZE / 2
+		// 绘图坐标draw 和 实际坐标site 之间存在固定偏差 bias = static_cast<int>(Size::BLOCK) / 2
 		// center = site + shape / 2
 		// draw = center + bias - shape / 2 
 		//      = site + bias
-		transparentimage(NULL, rect.site.y + BLOCK_SIZE / 2, rect.site.x + BLOCK_SIZE / 2, &faces.GetImage(), BLACK);
-		//putimage(rect.site.y + BLOCK_SIZE / 2, rect.site.x + BLOCK_SIZE / 2, &faces.GetImage());
+		transparentimage(NULL, rect.site.y + static_cast<int>(Size::BLOCK) / 2, rect.site.x + static_cast<int>(Size::BLOCK) / 2, &faces.GetImage(), BLACK);
+		//putimage(rect.site.y + static_cast<int>(Size::BLOCK) / 2, rect.site.x + static_cast<int>(Size::BLOCK) / 2, &faces.GetImage());
 	}
 
 	void Clear()
 	{
 		SetWorkingImage(p_background);
-		getimage(&back, rect.site.y + BLOCK_SIZE / 2, rect.site.x + BLOCK_SIZE / 2, rect.shape.y, rect.shape.x);
+		getimage(&back, rect.site.y + static_cast<int>(Size::BLOCK) / 2, rect.site.x + static_cast<int>(Size::BLOCK) / 2, rect.shape.y, rect.shape.x);
 
 		SetWorkingImage(NULL);
-		putimage(rect.site.y + BLOCK_SIZE / 2, rect.site.x + BLOCK_SIZE / 2, &back);
+		putimage(rect.site.y + static_cast<int>(Size::BLOCK) / 2, rect.site.x + static_cast<int>(Size::BLOCK) / 2, &back);
 	}
 
-	int GetDir() { return dir; }
+	Dir GetDir() { return dir; }
 
 };
 
@@ -493,7 +492,7 @@ public:
 				}
 
 
-				if (cd >= MONSTER_FEAR_TIME * 0.1)
+				if (cd >= static_cast<int>(Time::MONSTER_FEAR) * 0.1)
 					faces.SetIdx(4);
 				else if (cd % 10 > 5)
 					faces.SetIdx(5);
@@ -515,26 +514,26 @@ public:
 		SetFlash(dir);
 	}
 
-	void SetFlash(int d=0)
+	void SetFlash(Dir d = Dir::NOME)
 	{
 		if (status == 0)
 		{
 			switch (d)
 			{
-			case DIR_DOWN:  faces.SetIdx(3);  break;
-			case DIR_UP:	faces.SetIdx(2);  break;
-			case DIR_RIGHT: faces.SetIdx(0);  break;
-			case DIR_LEFT:	faces.SetIdx(1);  break;
+			case Dir::DOWN:		faces.SetIdx(3);  break;
+			case Dir::UP:		faces.SetIdx(2);  break;
+			case Dir::RIGHT:	faces.SetIdx(0);  break;
+			case Dir::LEFT:		faces.SetIdx(1);  break;
 			}
 		}
 		else if (status == 2)
 		{
 			switch (d)
 			{
-			case DIR_DOWN:  faces.SetIdx(8);  break;
-			case DIR_UP:	faces.SetIdx(6);  break;
-			case DIR_RIGHT: faces.SetIdx(7);  break;
-			case DIR_LEFT:	faces.SetIdx(9);  break;
+			case Dir::DOWN:		faces.SetIdx(8);  break;
+			case Dir::UP:		faces.SetIdx(6);  break;
+			case Dir::RIGHT:	faces.SetIdx(7);  break;
+			case Dir::LEFT:		faces.SetIdx(9);  break;
 			}
 		}
 
@@ -562,7 +561,7 @@ public:
 			brain.init(map, CPoint(mi, mj), CPoint(pi, pj));
 			brain.BuildAWay();
 
-			int dir = brain.GetDir();
+			Dir dir = brain.GetDir();
 			SetNewDir(dir);
 				
 			// 转向
@@ -649,7 +648,7 @@ public:
 			
 			brain.BuildAWay();
 
-			int dir = brain.GetDir();
+			Dir dir = brain.GetDir();
 			SetNewDir(dir);
 
 			// 转向
@@ -665,9 +664,9 @@ public:
 			brain.init(map, CPoint(mi, mj), CPoint(13, 10));
 			brain.BuildAWay();
 
-			int dir = brain.GetDir();
+			Dir dir = brain.GetDir();
 
-			if (dir == DIR_NONE)
+			if (dir == Dir::NOME)
 				Burn();
 			else
 				SetNewDir(dir);
@@ -712,13 +711,13 @@ public:
 		TCHAR str[10];
 		_itot_s(score, str, 10);
 
-		outtextxy(1 * BLOCK_SIZE + BLOCK_SIZE / 2, 11 * BLOCK_SIZE, _T("     "));
-		outtextxy(1 * BLOCK_SIZE + BLOCK_SIZE / 2, 11 * BLOCK_SIZE, str);
+		outtextxy(1 * static_cast<int>(Size::BLOCK) + static_cast<int>(Size::BLOCK) / 2, 11 * static_cast<int>(Size::BLOCK), _T("     "));
+		outtextxy(1 * static_cast<int>(Size::BLOCK) + static_cast<int>(Size::BLOCK) / 2, 11 * static_cast<int>(Size::BLOCK), str);
 	}
 
 	int Eat()	// 吃豆
 	{
-		const int t = EAT_TOLERANCE;
+		const int t = static_cast<int>(Tolerence::EAT);
 
 		// 节点位置
 		int dx, dy, i, j;
@@ -726,26 +725,26 @@ public:
 
 		if (abs(dx) + abs(dy) < t)
 		{
-			int m = map[i * MAP_COLUMN + j];
+			int m = map[i * static_cast<int>(Map::COLUMN) + j];
 			int r = 0;
 			if (m == 1)
 			{
-				r = POINT_SIZE;
+				r = static_cast<int>(Size::POINT);
 			}
 			else if (m == 2)
 			{
-				r = POINT_BIG_SIZE;
+				r = static_cast<int>(Size::BIG_POINT);
 			}
 
 			if (r != 0)
 			{
-				map[i * MAP_COLUMN + j] = 0;
+				map[i * static_cast<int>(Map::COLUMN) + j] = 0;
 
 				AddScore(m);
 
 				SetWorkingImage(p_background);
 				setfillcolor(BLACK);
-				solidcircle(j * BLOCK_SIZE + BLOCK_SIZE / 2, i * BLOCK_SIZE + BLOCK_SIZE / 2, r);
+				solidcircle(j * static_cast<int>(Size::BLOCK) + static_cast<int>(Size::BLOCK) / 2, i * static_cast<int>(Size::BLOCK) + static_cast<int>(Size::BLOCK) / 2, r);
 				SetWorkingImage(NULL);
 
 				return m;
@@ -767,7 +766,7 @@ public:
 			CMonster* mons = mons_list[i];
 			CPoint m_s = mons->GetSite();
 			int instance = abs(m_s.x - rect.site.x) + abs(m_s.y - rect.site.y);
-			if (instance <= FIGHT_TOLERANCE)
+			if (instance <= static_cast<int>(Tolerence::FIGHT))
 			{
 				int st = mons->GetStatus();
 				if (st == 0)

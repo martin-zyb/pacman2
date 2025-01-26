@@ -1,4 +1,3 @@
-//zh_CN.GBK
 #pragma once
 #include "define.h"
 #include "mover.h"
@@ -8,14 +7,14 @@
 extern int cnt1;
 extern int cnt2;
 
-extern int game_mode;
+extern Status game_mode;
 
-extern bool game_close;					// Ö¸µ¼ÓÎÏ·¹Ø±ÕµÄÈ«¾Ö±äÁ¿
-extern bool update_event;				// Ö¸µ¼»æÍ¼¸üĞÂµÄÈ«¾Ö±äÁ¿£¬¿ØÖÆÖ¡ÂÊ
-extern char key;						// ¼üÅÌ·ûºÅÔİ´æ
+extern bool game_close;					// æŒ‡å¯¼æ¸¸æˆå…³é—­çš„å…¨å±€å˜é‡
+extern bool update_event;				// æŒ‡å¯¼ç»˜å›¾æ›´æ–°çš„å…¨å±€å˜é‡ï¼Œæ§åˆ¶å¸§ç‡
+extern char key;						// é”®ç›˜ç¬¦å·æš‚å­˜
 
-DWORD WINAPI time_thread(PVOID param);		// ¶¨Ê±²¶»ñ¶àÏß³Ì
-DWORD WINAPI keyboard_thread(PVOID);		// ¼üÅÌ²¶»ñ¶àÏß³Ì
+DWORD WINAPI time_thread(PVOID param);		// å®šæ—¶æ•è·å¤šçº¿ç¨‹
+DWORD WINAPI keyboard_thread(PVOID);		// é”®ç›˜æ•è·å¤šçº¿ç¨‹
 
 void init();
 void init_map();
@@ -35,4 +34,4 @@ void gaming_deal();
 void end_deal();
 
 
-void set_game_mode(int mode);
+void set_game_mode(Status mode);

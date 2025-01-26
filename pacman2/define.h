@@ -1,54 +1,66 @@
-//zh_CN.GBK
 #pragma once
-// ¶¨ÒåÁË¶şÎ¬¿Õ¼äµÄ pointÀà ºÍ ÓÃÓÚ±ê×¢ÇøÓòµÄ rectÀà
-#include <easyx.h>
+// å®šä¹‰äº†äºŒç»´ç©ºé—´çš„ pointç±» å’Œ ç”¨äºæ ‡æ³¨åŒºåŸŸçš„ rectç±»
+#include <graphics.h>
 #include <conio.h>
-#include <time.h>
 
+#include <ctime>
 #include <vector>
-#include <iostream>
-#include <iterator>
 #include <string>
-#include <list>
-#include <random>
+
 using namespace std;
 
 
-#define DIR_NONE	 0	// ·½Ïòºê¶¨Òå
-#define DIR_UP		-1
-#define DIR_DOWN	 1
-#define DIR_LEFT	-2
-#define DIR_RIGHT	 2
+enum class Dir : short	// æ–¹å‘å®šä¹‰
+{
+	NOME = 0, UP = -1, DOWN = 1, LEFT = -2, RIGHT = 2
+};
 
+enum class Size : short
+{
+	POINT = 1,		// è±†å­å¤§å°
+	BIG_POINT = 3,	// å¤§åŠ›ä¸¸å¤§å°
+	BLOCK = 20,		// æ–¹æ ¼å¤§å°
+	PERSON = 30		// äººç‰©å¤§å°
+};
 
-#define BLOCK_SIZE 20			// ·½¸ñ´óĞ¡
-#define PERSON_SIZE 30			// ÈËÎï´óĞ¡ 
-#define POINT_SIZE 1			// ¶¹×Ó´óĞ¡
-#define POINT_BIG_SIZE 3		// ´óÁ¦Íè´óĞ¡
+enum class Status : short
+{
+	GAMING, END, MENU
+};
 
-#define BEAN_NUM 195	// ¶¹×Ó×ÜÊı£¨º¬´óÁ¦Íè£©
+enum class Tolerence : short
+{
+	MOVE = 5,		// è½¬å¼¯å®¹é™
+	EAT = 8,		// åƒè±†å®¹é™
+	FIGHT = 12		// æˆ˜æ–—å®¹é™
+};
 
-#define FPS 60
-#define PACMAN_SPEED 3
-#define MONSTER_SPEED_0 1.5
-#define MONSTER_SPEED_1 2.5
-#define MONSTER_FEAR_TIME 600
-#define EAT_FLASH_TIME 5
+enum class Speed : short	// é€Ÿåº¦
+{
+	MONSTER_SLOW = 15,	// æ€ªç‰©æ…¢é€Ÿåº¦ * 10
+	MONSTER_FAST = 25,	// æ€ªç‰©å¿«é€Ÿåº¦ * 10
+	PACMAN = 30			// äººç‰©é€Ÿåº¦ * 10
+};
 
-#define MOVE_TOLERENCE 5		// ×ªÍäÈİÏŞ
-#define EAT_TOLERANCE 8			// ³Ô¶¹ÈİÏŞ
-#define FIGHT_TOLERANCE 12		// Õ½¶·ÈİÏŞ
+enum class Map : short
+{
+	COLUMN = 21,		// åœ°å›¾æ–¹æ ¼åˆ—æ•°
+	ROW = 27,			// åœ°å›¾æ–¹æ ¼è¡Œæ•°
+	CNT = COLUMN * ROW	// åœ°å›¾æ–¹æ ¼æ€»æ•°
+};
 
-#define MAP_COLUMN 21			// µØÍ¼·½¸ñÁĞÊı
-#define MAP_ROW 27				// µØÍ¼·½¸ñĞĞÊı
-#define MAP_CNT (MAP_COLUMN * MAP_ROW)	// µØÍ¼·½¸ñ×ÜÊı
+enum class Time : short
+{
+	EAT_FLASH = 5,
+	MONSTER_FEAR = 600		// æ€ªç‰©ææƒ§æ—¶é•¿
+};
 
-#define GAME_WIDTH (MAP_COLUMN*BLOCK_SIZE)	// ÓÎÏ·´°¿Ú¿í¶È
-#define GAME_HEIGHT (MAP_ROW*BLOCK_SIZE)	// ÓÎÏ·´°¿Ú¸ß¶È
+constexpr auto BEAN_NUM = 195;	// è±†å­æ€»æ•°(å«å¤§åŠ›ä¸¸)
 
-#define END 1
-#define MENU 2
-#define GAMING 0
+constexpr auto FPS = 60;
+
+#define GAME_WIDTH  (static_cast<int>(Map::COLUMN) * static_cast<int>(Size::BLOCK))	// æ¸¸æˆçª—å£å®½åº¦
+#define GAME_HEIGHT (static_cast<int>(Map::ROW) * static_cast<int>(Size::BLOCK))	// æ¸¸æˆçª—å£é«˜åº¦
 
 
 class CPoint
@@ -63,8 +75,8 @@ public:
 class CRect
 {
 public:
-	CPoint site;		// ×óÉÏ½Ç×ø±ê = [ĞĞ£¬ÁĞ]
-	CPoint shape;		// ÇøÓò´óĞ¡   = [¸ß£¬¿í]
+	CPoint site;		// å·¦ä¸Šè§’åæ ‡ = [è¡Œï¼Œåˆ—]
+	CPoint shape;		// åŒºåŸŸå¤§å°   = [é«˜ï¼Œå®½]
 	CRect() :site(CPoint()), shape(CPoint()) {}
 	CRect(int x, int y, int h, int w) :site(CPoint(x, y)), shape(CPoint(h, w)) {}
 };

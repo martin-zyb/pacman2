@@ -1,4 +1,3 @@
-//zh_CN.GBK
 #pragma once
 #include "define.h"
 
@@ -18,17 +17,17 @@ public:
 class CAStar
 {
 private:
-	CAStarNode ns[MAP_CNT];	// µã¼¯
+	CAStarNode ns[static_cast<int>(Map::CNT)];	// ç‚¹é›†
 
-	vector<int> open_list;		// ¿ª·ÅÁĞ±í
-	//list<int> close_list;		// ¹Ø±ÕÁĞ±í // ¶şÎ¬µØÍ¼¹Ø±ÕÁĞ±íµÄ´óĞ¡³Én^2Ôö³¤£¬±éÀúºÄÊ±¼«¸ß£¬Òò´ËÊ¹ÓÃ·Ö²¼Ê½´æ´¢£¬Ö±½Ó·ÃÎÊ½á¹û
-								// ¶ø¿ª·ÅÁĞ±íµÄÊıÁ¿¼¶½ÏĞ¡£¬¿ÉÒÔÊ¹ÓÃlistĞÎÊ½£¬ºÄÊ±²»ÊÇºÜ¶à
+	vector<int> open_list;		// å¼€æ”¾åˆ—è¡¨
+	//list<int> close_list;		// å…³é—­åˆ—è¡¨ // äºŒç»´åœ°å›¾å…³é—­åˆ—è¡¨çš„å¤§å°æˆn^2å¢é•¿ï¼Œéå†è€—æ—¶æé«˜ï¼Œå› æ­¤ä½¿ç”¨åˆ†å¸ƒå¼å­˜å‚¨ï¼Œç›´æ¥è®¿é—®ç»“æœ
+								// è€Œå¼€æ”¾åˆ—è¡¨çš„æ•°é‡çº§è¾ƒå°ï¼Œå¯ä»¥ä½¿ç”¨listå½¢å¼ï¼Œè€—æ—¶ä¸æ˜¯å¾ˆå¤š
 
-	int s;	// ¿ªÊ¼½áµã£¨¹ÖÎï£©
-	int e;	// ½áÊø½áµã£¨Íæ¼Ò£©
+	int s;	// å¼€å§‹ç»“ç‚¹ï¼ˆæ€ªç‰©ï¼‰
+	int e;	// ç»“æŸç»“ç‚¹ï¼ˆç©å®¶ï¼‰
 
-	int w_inst;	// ¾àÀëÈ¨ÖØ£¬´ËÖµÔ½´ó£¬monsterÔ½×¢ÖØ¾àÀë¿ØÖÆ
-	int w_path;	// Â·¾¶È¨ÖØ£¬´ËÖµÔ½´ó£¬monsterÔ½×¢ÖØ¶ÌÂ·¾¶
+	int w_inst;	// è·ç¦»æƒé‡ï¼Œæ­¤å€¼è¶Šå¤§ï¼Œmonsterè¶Šæ³¨é‡è·ç¦»æ§åˆ¶
+	int w_path;	// è·¯å¾„æƒé‡ï¼Œæ­¤å€¼è¶Šå¤§ï¼Œmonsterè¶Šæ³¨é‡çŸ­è·¯å¾„
 
 	COLORREF color;
 	bool path_show;
@@ -39,9 +38,9 @@ public:
 
 	void SetNodeWall(int r,int c)
 	{
-		if (r < 0 || r >= MAP_ROW || c < 0 || c >= MAP_COLUMN)
+		if (r < 0 || r >= static_cast<int>(Map::ROW) || c < 0 || c >= static_cast<int>(Map::COLUMN))
 			return;
-		int k = r * MAP_COLUMN + c;
+		int k = r * static_cast<int>(Map::COLUMN) + c;
 		ns[k].close = 1;
 	}
 
@@ -61,16 +60,16 @@ public:
 		w_path = path;
 	}
 
-	// ³õÊ¼»¯
+	// åˆå§‹åŒ–
 	void init(int* map, CPoint sp, CPoint ep)
 	{
 		open_list.clear();
 		//close_list.clear();
 		
-		e = ep.x * MAP_COLUMN + ep.y;
-		s = sp.x * MAP_COLUMN + sp.y;
+		e = ep.x * static_cast<int>(Map::COLUMN) + ep.y;
+		s = sp.x * static_cast<int>(Map::COLUMN) + sp.y;
 
-		for (int i = 0; i < MAP_CNT; i++)
+		for (int i = 0; i < static_cast<int>(Map::CNT); i++)
 		{
 			//if (map[i] == 3)
 				//close_list.push_back(i);
@@ -79,7 +78,7 @@ public:
 			ns[i].G = 0;
 			
 			int dk = abs(i - e);
-			ns[i].H = (dk / MAP_COLUMN + dk % MAP_COLUMN) * w_inst;
+			ns[i].H = (dk / static_cast<int>(Map::COLUMN) + dk % static_cast<int>(Map::COLUMN)) * w_inst;
 
 			ns[i].father = 0;
 		}
@@ -115,10 +114,10 @@ public:
 
 	void BuildAWay()
 	{
-		open_list.push_back(s); // Ìí¼ÓµÚÒ»¸ö½áµã
+		open_list.push_back(s); // æ·»åŠ ç¬¬ä¸€ä¸ªç»“ç‚¹
 		ns[s].open = 1;
 
-		int k_current = s;	// ÉèÖÃÆğµã
+		int k_current = s;	// è®¾ç½®èµ·ç‚¹
 
 		while (1)
 		{
@@ -128,16 +127,16 @@ public:
 			if (open_list.size() == 0)
 				break;
 
-			// ²éÑ¯ÏÂÒ»¸ö½áµã
+			// æŸ¥è¯¢ä¸‹ä¸€ä¸ªç»“ç‚¹
 			k_current = FindMinF();
 			ns[k_current].close = 1;
 
 
-			// ËÑÑ°ÖÜÎ§½áµã
+			// æœå¯»å‘¨å›´ç»“ç‚¹
 			for (int i = 0; i < 4; i++)
 			{
-				int ni = k_current / MAP_COLUMN;
-				int nj = k_current % MAP_COLUMN;
+				int ni = k_current / static_cast<int>(Map::COLUMN);
+				int nj = k_current % static_cast<int>(Map::COLUMN);
 
 				switch (i)
 				{
@@ -147,19 +146,19 @@ public:
 				case 3: nj++; break;
 				}
 
-				if (ni < 0 || ni >= MAP_ROW || nj < 0 || nj >= MAP_COLUMN)
+				if (ni < 0 || ni >= static_cast<int>(Map::ROW) || nj < 0 || nj >= static_cast<int>(Map::COLUMN))
 					continue;
 
-				int k_next = ni * MAP_COLUMN + nj;
+				int k_next = ni * static_cast<int>(Map::COLUMN) + nj;
 
-				if (!ns[k_next].close)			// Ã»¼ÓÈëclose £¨ Ç½£¬»òÕßÌ½²éÍê±ÏµÄ½áµã £©
+				if (!ns[k_next].close)			// æ²¡åŠ å…¥close ï¼ˆ å¢™ï¼Œæˆ–è€…æ¢æŸ¥å®Œæ¯•çš„ç»“ç‚¹ ï¼‰
 				{
 					int G_old = ns[k_next].G;
 					int G_new = ns[k_current].G + w_path;
 
-					if (ns[k_next].open)		// ÒÑ¾­¼ÓÈëÁËopen
+					if (ns[k_next].open)		// å·²ç»åŠ å…¥äº†open
 					{
-						// ÓÅ»¯Â·¾¶
+						// ä¼˜åŒ–è·¯å¾„
 						if (G_old > G_new )	
 						{
 							ns[k_next].G = G_new;
@@ -171,7 +170,7 @@ public:
 						ns[k_next].G = G_new;
 						ns[k_next].father = k_current;
 
-						open_list.push_back(k_next);			// Ìí¼Ó½øopen_list
+						open_list.push_back(k_next);			// æ·»åŠ è¿›open_list
 						ns[k_next].open = 1;
 					}
 				}
@@ -181,8 +180,8 @@ public:
 	}
 
 
-	// »ñµÃ·½Ïò
-	int GetDir()
+	// è·å¾—æ–¹å‘
+	Dir GetDir()
 	{
 		if (path_show)
 		{
@@ -211,10 +210,10 @@ public:
 
 			if (path_show)
 			{
-				int xi = k[0] / MAP_COLUMN * BLOCK_SIZE + BLOCK_SIZE / 2;
-				int xj = k[0] % MAP_COLUMN * BLOCK_SIZE + BLOCK_SIZE / 2;
-				int yi = k[1] / MAP_COLUMN * BLOCK_SIZE + BLOCK_SIZE / 2;
-				int yj = k[1] % MAP_COLUMN * BLOCK_SIZE + BLOCK_SIZE / 2;
+				int xi = k[0] / static_cast<int>(Map::COLUMN) * static_cast<int>(Size::BLOCK) + static_cast<int>(Size::BLOCK) / 2;
+				int xj = k[0] % static_cast<int>(Map::COLUMN) * static_cast<int>(Size::BLOCK) + static_cast<int>(Size::BLOCK) / 2;
+				int yi = k[1] / static_cast<int>(Map::COLUMN) * static_cast<int>(Size::BLOCK) + static_cast<int>(Size::BLOCK) / 2;
+				int yj = k[1] % static_cast<int>(Map::COLUMN) * static_cast<int>(Size::BLOCK) + static_cast<int>(Size::BLOCK) / 2;
 				line(xj, xi, yj, yi);
 			}
 
@@ -223,12 +222,12 @@ public:
 	
 		}
 
-		if (k[0] - k[1] == MAP_COLUMN)	return DIR_DOWN;
-		if (k[0] - k[1] == -MAP_COLUMN)	return DIR_UP;
-		if (k[0] - k[1] == -1)			return DIR_LEFT;
-		if (k[0] - k[1] == 1)			return DIR_RIGHT;
+		if (k[0] - k[1] == static_cast<int>(Map::COLUMN))	return Dir::DOWN;
+		if (k[0] - k[1] == -static_cast<int>(Map::COLUMN))	return Dir::UP;
+		if (k[0] - k[1] == -1)			return Dir::LEFT;
+		if (k[0] - k[1] == 1)			return Dir::RIGHT;
 
-		return DIR_NONE;
+		return Dir::NOME;
 	}
 
 
