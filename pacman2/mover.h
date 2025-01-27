@@ -13,7 +13,7 @@ class CMover
 protected:
 	IMAGE* p_background;		// 背景图片的指针
 	IMAGE back;					// 为了加快clear的速度，设置back成员储存每次的背景图
-	CFlashGroup faces;	// 各方向动画序列的容器
+	CFlashGroup faces;			// 各方向动画序列的容器
 
 	CRect rect;					// 当前的位置
 
@@ -119,7 +119,7 @@ public:
 
 	void Move(double ss)
 	{
-		int s = (int)ss;
+		int s = static_cast<int>(ss);
 		speed_d += (ss - s);
 		if (speed_d >= 1)
 		{
@@ -598,7 +598,7 @@ public:
 				||(abs(escape_rc.x - pi) <= 10 && abs(escape_rc.y- pj) <= 5))
 			{
 				
-				while (1)
+				while (true)
 				{
 					int r = rand() % 7;
 					if (abs(r - danger_row_idx) > 1)
@@ -608,7 +608,7 @@ public:
 					}
 				}
 
-				while (1)
+				while (true)
 				{
 					int c = rand() % 6;
 					if (abs(c - danger_column_idx) > 1)
@@ -617,7 +617,6 @@ public:
 						break;
 					}
 				}
-				//cout << "escape_rc = (" << escape_rc.x << "," << escape_rc.y << ")\n";
 			}
 
 

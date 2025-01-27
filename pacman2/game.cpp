@@ -40,7 +40,7 @@ void HpSleep(int ms)
 
 DWORD WINAPI time_thread(PVOID param)
 {
-	int fps = (int)param;
+	int fps = reinterpret_cast<int>(param);
 	int ms = 1000 / fps;
 	while (1)
 	{
@@ -104,7 +104,7 @@ void init()
 	update_event = 0;				// 指导绘图更新的全局变量，控制帧率
 	key = 0;						// 键盘符号缓存
 
-	srand((unsigned int)time(NULL));
+	srand(static_cast<unsigned int>(time(NULL)));
 
 	// init graph
 	initgraph(GAME_WIDTH, GAME_HEIGHT + 20, EX_SHOWCONSOLE);		// The new version of EasyX will Rename EW_SHOWCONSOLE macro to EX_ SHOWCONSOLE
@@ -135,7 +135,7 @@ void init()
 
 	// 设置多线程
 	CreateThread(NULL, 0, keyboard_thread, NULL, 0, NULL);
-	CreateThread(NULL, 0, time_thread, (PVOID)FPS, 0, NULL);
+	CreateThread(NULL, 0, time_thread, reinterpret_cast<PVOID>(FPS), 0, NULL);
 }
 
 void init_map()

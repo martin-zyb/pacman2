@@ -20,8 +20,6 @@ private:
 	CAStarNode ns[static_cast<int>(Map::CNT)];	// 点集
 
 	vector<int> open_list;		// 开放列表
-	//list<int> close_list;		// 关闭列表 // 二维地图关闭列表的大小成n^2增长，遍历耗时极高，因此使用分布式存储，直接访问结果
-								// 而开放列表的数量级较小，可以使用list形式，耗时不是很多
 
 	int s;	// 开始结点（怪物）
 	int e;	// 结束结点（玩家）
@@ -64,15 +62,12 @@ public:
 	void init(int* map, CPoint sp, CPoint ep)
 	{
 		open_list.clear();
-		//close_list.clear();
 		
 		e = ep.x * static_cast<int>(Map::COLUMN) + ep.y;
 		s = sp.x * static_cast<int>(Map::COLUMN) + sp.y;
 
 		for (int i = 0; i < static_cast<int>(Map::CNT); i++)
 		{
-			//if (map[i] == 3)
-				//close_list.push_back(i);
 			ns[i].close = (map[i] == 3) ? 1 : 0;
 			ns[i].open = 0;
 			ns[i].G = 0;
@@ -119,7 +114,7 @@ public:
 
 		int k_current = s;	// 设置起点
 
-		while (1)
+		while (true)
 		{
 			if (k_current == e)
 				break;
@@ -230,8 +225,4 @@ public:
 		return Dir::NOME;
 	}
 
-
-
 };
-
-/**/

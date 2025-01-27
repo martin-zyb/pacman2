@@ -70,9 +70,6 @@ public:
 			m_list[idx_now].Update();
 
 			// 全部更新↓ 或者 ↑仅更新当前显示的动画序列
-
-			//for (vector<CFlash>::iterator iter = m_list.begin(); iter != m_list.end(); iter++)
-			//	(*iter).Update();
 		}
 	}
 };
